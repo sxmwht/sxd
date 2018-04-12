@@ -8,7 +8,7 @@ PROJ_NAME = sxd
 
 CARGS = 
 
-LIBS = -lncurses
+LIBS = -lncurses -lm
 
 INC = inc/
 

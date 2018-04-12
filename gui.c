@@ -1,5 +1,6 @@
 #include <ncurses.h>  //for interface
 #include "gui.h"
+#include <math.h>
 
 
 /*
@@ -59,11 +60,13 @@ void setUpGUI() {
   gui.colNr  = newwin(COLNR_HEIGHT, COLNR_WIDTH, TITLE_HEIGHT, LINENR_WIDTH);
   gui.status = newwin(STATUS_HEIGHT, STATUS_WIDTH, LINES-STATUS_HEIGHT, 0);
   gui.hex    = newwin(HEX_HEIGHT, HEX_WIDTH, COLNR_HEIGHT + TITLE_HEIGHT, LINENR_WIDTH);
-  gui.ascii  = newwin(ASCII_HEIGHT, ASCII_WIDTH, TITLE_HEIGHT, COLS-ASCII_WIDTH);
+  gui.ascii  = newwin(ASCII_HEIGHT, ASCII_WIDTH, TITLE_HEIGHT, LINENR_WIDTH + HEX_WIDTH);
 
   wattrset(gui.title, A_BOLD);
   wattrset(gui.lineNr, A_BOLD);
   wattrset(gui.colNr, A_BOLD);
+
+  box(gui.ascii, 0,0);
 
   wrefresh(gui.ascii);
   wrefresh(gui.title);

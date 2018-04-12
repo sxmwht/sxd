@@ -6,6 +6,7 @@
 #include <fcntl.h>    //for open
 #include <unistd.h>   //for close
 #include "gui.h"
+#include <math.h>
 
 typedef struct position {
   int x;
