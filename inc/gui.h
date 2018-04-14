@@ -1,29 +1,28 @@
 #ifndef GUI_h
 #define GUI_h
 
-#define TITLE_HEIGHT 3
-#define TITLE_WIDTH LINES
-#define STATUS_HEIGHT 2
-#define COLNR_HEIGHT 3
-#define LINENR_WIDTH 20
-#define LINENR_HEIGHT (LINES - TITLE_HEIGHT - STATUS_HEIGHT)
-#define STATUS_WIDTH COLS
-#define ASCII_HEIGHT LINENR_HEIGHT
-#define CHARS_PER_LINE ((COLS - LINENR_WIDTH) * 8 / 33)
-#define ASCII_WIDTH ((COLS - LINENR_WIDTH) * 8 / 33)
-#define COLNR_WIDTH (ASCII_WIDTH * 25) / 8
-#define HEX_WIDTH COLNR_WIDTH
-#define HEX_HEIGHT (LINES - TITLE_HEIGHT - COLNR_HEIGHT - STATUS_HEIGHT)
-
 void setUpGUI();
 
 struct GUI {
+  int chars_per_line;
   WINDOW* title;
+  int title_height;
+  int title_width;
   WINDOW* colNr;
+  int colNr_height;
+  int colNr_width;
   WINDOW* lineNr;
+  int lineNr_height;
+  int lineNr_width;
   WINDOW* hex;
+  int hex_height;
+  int hex_width;
   WINDOW* ascii;
+  int ascii_height;
+  int ascii_width;
   WINDOW* status;
+  int status_height;
+  int status_width;
 } gui;
 
 #endif

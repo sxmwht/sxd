@@ -54,19 +54,47 @@ void setUpGUI() {
 
   refresh();
 
+  gui.title_height=3;
+  gui.title_width=COLS;
+  gui.status_height=2;
+  gui.colNr_height=2;
+  gui.lineNr_width=20;
+  gui.lineNr_height=(LINES - gui.title_height - gui.status_height);
+  gui.status_width=COLS;
+  gui.ascii_height=gui.lineNr_height;
+  gui.hex_height=(LINES - gui.title_height - gui.colNr_height - gui.status_height);
+
+  gui.chars_per_line=((COLS - gui.lineNr_width) * 8 / 33);
+
+  int i = 0;
+
+  while (gui.chars_per_line >>= 1) {i++;};
+
+  gui.ascii_width = pow(2, i);
+
+  gui.hex_width = gui.ascii_width * 25 / 8;
+  gui.colNr_width = gui.hex_width;
+
   //newwin(height, width, starty, startx)
-  gui.title  = newwin(TITLE_HEIGHT, TITLE_WIDTH, 0, 0);
-  gui.lineNr = newwin(LINENR_HEIGHT, LINENR_WIDTH, TITLE_HEIGHT, 0);
-  gui.colNr  = newwin(COLNR_HEIGHT, COLNR_WIDTH, TITLE_HEIGHT, LINENR_WIDTH);
-  gui.status = newwin(STATUS_HEIGHT, STATUS_WIDTH, LINES-STATUS_HEIGHT, 0);
-  gui.hex    = newwin(HEX_HEIGHT, HEX_WIDTH, COLNR_HEIGHT + TITLE_HEIGHT, LINENR_WIDTH);
-  gui.ascii  = newwin(ASCII_HEIGHT, ASCII_WIDTH, TITLE_HEIGHT, LINENR_WIDTH + HEX_WIDTH);
+  gui.title  = newwin(gui.title_height, gui.title_width, 0, 0);
+  gui.lineNr = newwin(gui.lineNr_height, gui.lineNr_width, gui.title_height + gui.colNr_height, 0);
+  gui.colNr  = newwin(gui.colNr_height, gui.colNr_width, gui.title_height, gui.lineNr_width);
+  gui.status = newwin(gui.status_height, gui.status_width, LINES-gui.status_height, 0);
+  gui.hex    = newwin(gui.hex_height, gui.hex_width, gui.colNr_height + gui.title_height, gui.lineNr_width);
+  gui.ascii  = newwin(gui.ascii_height, gui.ascii_width, gui.title_height + gui.colNr_height, gui.lineNr_width + gui.hex_width);
 
   wattrset(gui.title, A_BOLD);
   wattrset(gui.lineNr, A_BOLD);
   wattrset(gui.colNr, A_BOLD);
+ 
+////outline gui elements for debugging
+//  box(gui.ascii, 0,0);
+//  box(gui.hex, 0, 0);
+//  box(gui.status, 0, 0);
+//  box(gui.colNr, 0, 0);
+//  box(gui.lineNr, 0, 0);
+//  box(gui.title, 0, 0);
 
-  box(gui.ascii, 0,0);
 
   wrefresh(gui.ascii);
   wrefresh(gui.title);
@@ -74,8 +102,6 @@ void setUpGUI() {
   wrefresh(gui.lineNr);
   wrefresh(gui.colNr);
   wrefresh(gui.hex);
-
-  printf("%d", COLNR_WIDTH);
 
   return;
 }
