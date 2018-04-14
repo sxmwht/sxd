@@ -36,6 +36,27 @@ char *open_file(int *file, struct stat *sb, char *fname){
 }
 
 
+void move_next_char(char dir) {
+  
+  char ch;
+  int i = 1;
+
+  if (dir == 'r') {
+    while (((ch = mvwinch(gui.hex, cursor.y, cursor.x + i)) & A_CHARTEXT) == ' ')
+      i++;
+
+    wmove(gui.hex, cursor.y, cursor.x + i);
+  }
+  else if (dir == 'l') {
+    while (((ch = mvwinch(gui.hex, cursor.y, cursor.x - i)) & A_CHARTEXT) == ' ')
+      i++;
+    wmove(gui.hex, cursor.y, cursor.x - i);
+  }
+
+
+}
+
+
 void test_print(char *map, struct stat *sb){
 
 
@@ -150,7 +171,7 @@ int main (int argc, char **argv) {
     getyx(gui.hex, cursor.y, cursor.x);
     switch (ch) {
       case 'h': 
-        wmove(gui.hex, cursor.y    , cursor.x - 1);
+        move_next_char('l');
         break;
       case 'j': 
         wmove(gui.hex, cursor.y + 1, cursor.x    );
@@ -159,7 +180,7 @@ int main (int argc, char **argv) {
         wmove(gui.hex, cursor.y - 1, cursor.x    );
         break;
       case 'l': 
-        wmove(gui.hex, cursor.y    , cursor.x + 1);
+        move_next_char('r');
         break;
 
     }
