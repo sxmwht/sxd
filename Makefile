@@ -18,7 +18,7 @@ proj: sxd
 
 
 sxd: $(OBJS)
-	$(CC) $(CARGS)-o $@ $^ $(LIBS)
+	$(CC) $(CARGS)-o $@ $^ $(LIBS) -Wall -Wextra
 
 main.o: main.c
 	$(CC) -c $(CARGS) $< -o $@ -Iinc

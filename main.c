@@ -13,7 +13,10 @@ typedef struct position {
   int y;
 } position;
 
+int current_window;
+
 position cursor;
+position cursor_last;
 
 char *open_file(int *file, struct stat *sb, char *fname){
 
@@ -42,23 +45,44 @@ void move_next_char(char dir) {
   int i = 1;
 
   if (dir == 'r') {
-    while (((ch = mvwinch(gui.hex, cursor.y, cursor.x + i)) & A_CHARTEXT) == ' ')
-      i++;
-
-    wmove(gui.hex, cursor.y, cursor.x + i);
+    if (cursor.x == 0) {
+      wmove(gui.hex_cols[current_window], cursor.y, 1);
+    }
+    else if (cursor.x == 1) {
+      if (current_window == gui.ascii_width-1) {
+       // if (cursor.y > 0) {
+          wmove(gui.hex_cols[0], cursor.y + 1, 0);
+          current_window = 0;
+        //}
+      }
+      else {
+        wmove(gui.hex_cols[current_window+1], cursor.y, 0);
+        current_window++;
+      }
+    }
   }
+
   else if (dir == 'l') {
-    while (((ch = mvwinch(gui.hex, cursor.y, cursor.x - i)) & A_CHARTEXT) == ' ')
-      i++;
-    wmove(gui.hex, cursor.y, cursor.x - i);
+    if (cursor.x == 1) {
+      wmove(gui.hex_cols[current_window], cursor.y, 0);
+    }
+    else if (cursor.x == 0) {
+      if (current_window == 0) {
+        if (cursor.y > 0) {
+          wmove(gui.hex_cols[gui.ascii_width-1], cursor.y - 1, 1);
+          current_window = gui.ascii_width-1;
+        }
+      }
+      else {
+        wmove(gui.hex_cols[current_window-1], cursor.y, 1);
+        current_window--;
+      }
+    }
   }
-
-
 }
 
 
 void test_print(char *map, struct stat *sb){
-
 
   wprintw(gui.title, "========= SXD Hex Editor ==========================\n\n");
 
@@ -98,8 +122,8 @@ void test_print(char *map, struct stat *sb){
         //string
 
         //get cursor position in hex window
-        getyx(gui.hex, cursor.y, cursor.x);
-        mvwprintw(gui.ascii, cursor.y, 0, "%s\n", tmp_data);
+        getyx(gui.hex_cols[gui.ascii_width-1], cursor.y, cursor.x);
+        mvwprintw(gui.ascii, cursor.y - 1, 0, "%s\n", tmp_data);
         wrefresh(gui.ascii);
 
         //blank the string
@@ -108,18 +132,18 @@ void test_print(char *map, struct stat *sb){
       }
 
       //print the new line number
-      getyx(gui.hex, cursor.y, cursor.x);
-      mvwprintw(gui.lineNr, cursor.y + 1 , 0,"%4d\t%08x\t", i, i);
+      getyx(gui.hex_cols[0], cursor.y, cursor.x);
+      mvwprintw(gui.lineNr, cursor.y, 0,"%4d\t%08x\t", i, i);
       wrefresh(gui.lineNr);
-      wrefresh(gui.hex);
-      wmove(gui.hex, cursor.y + 1, 0);
+      wmove(gui.hex_cols[0], cursor.y, 0);
     }
 
-    //print a gap after each 8 chars, like with the col nos 
-    else if (i%8 == 0)
-      wprintw(gui.hex, " ");
+//    //print a gap after each 8 chars, like with the col nos 
+//    else if (i%8 == 0)
+//      wprintw(gui.hex, " ");
+
     //print the character's hex
-    wprintw(gui.hex, "%02x ", c);
+    mvwprintw(gui.hex_cols[i%gui.ascii_width], i/gui.ascii_width, 0, "%02x ", c);
 
     //only append c to the tmp_data string if it is ascii, otherwise use a .
     if (c < 0x20)
@@ -143,16 +167,17 @@ void test_print(char *map, struct stat *sb){
 
   curs_set(2);
 
-  wmove(gui.hex, 1, 0);
-  wrefresh(gui.hex);
+  for (i=0; i<gui.ascii_width; i++)
+    wrefresh(gui.hex_cols[i]);
 
-
-  getch();
+  wmove(gui.hex_cols[0], 0, 0);
+  wrefresh(gui.hex_cols[0]);
 
   return;
 }
 
 int main (int argc, char **argv) {
+
   int file;
 
   struct stat sb;
@@ -165,26 +190,31 @@ int main (int argc, char **argv) {
   //getch();
 
   test_print(map, &sb);
+  getch();
+  current_window = 0;
 
   char ch;
   while (( ch = getch()) != 'q') {
-    getyx(gui.hex, cursor.y, cursor.x);
+    getyx(gui.hex_cols[current_window], cursor.y, cursor.x);
+    wchgat(gui.ascii, 1, !A_BOLD, 0, NULL);
     switch (ch) {
       case 'h': 
         move_next_char('l');
         break;
-      case 'j': 
-        wmove(gui.hex, cursor.y + 1, cursor.x    );
+      case 'j':
+        wmove(gui.hex_cols[current_window], cursor.y + 1, cursor.x    );
         break;
       case 'k': 
-        wmove(gui.hex, cursor.y - 1, cursor.x    );
+        wmove(gui.hex_cols[current_window], cursor.y - 1, cursor.x    );
         break;
-      case 'l': 
+      case 'l':
         move_next_char('r');
         break;
-
     }
-        wrefresh(gui.hex);
+    getyx(gui.hex_cols[current_window], cursor.y, cursor.x);
+    mvwchgat(gui.ascii, cursor.y, current_window, 1, A_BOLD, 0, NULL);
+    wrefresh(gui.ascii);
+    wrefresh(gui.hex_cols[current_window]);
   };
 
   close(file);
