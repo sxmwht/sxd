@@ -81,7 +81,6 @@ void move_next_char(char dir) {
   }
 }
 
-
 void test_print(char *map, struct stat *sb){
 
   wprintw(gui.title, "========= SXD Hex Editor ==========================\n\n");
@@ -190,32 +189,52 @@ int main (int argc, char **argv) {
   //getch();
 
   test_print(map, &sb);
-  getch();
   current_window = 0;
 
+  bool quit = 0;
+
   char ch;
-  while (( ch = getch()) != 'q') {
-    getyx(gui.hex_cols[current_window], cursor.y, cursor.x);
-    wchgat(gui.ascii, 1, !A_BOLD, 0, NULL);
-    switch (ch) {
-      case 'h': 
-        move_next_char('l');
-        break;
-      case 'j':
-        wmove(gui.hex_cols[current_window], cursor.y + 1, cursor.x    );
-        break;
-      case 'k': 
-        wmove(gui.hex_cols[current_window], cursor.y - 1, cursor.x    );
-        break;
-      case 'l':
-        move_next_char('r');
-        break;
+  char str[80];
+  while (!quit) {
+    while (( ch = getch()) != ':') {
+      getyx(gui.hex_cols[current_window], cursor.y, cursor.x);
+      wchgat(gui.ascii, 1, !A_BOLD, 0, NULL);
+      switch (ch) {
+        case 'h': 
+          move_next_char('l');
+          break;
+        case 'j':
+          wmove(gui.hex_cols[current_window], cursor.y + 1, cursor.x    );
+          break;
+        case 'k': 
+          wmove(gui.hex_cols[current_window], cursor.y - 1, cursor.x    );
+          break;
+        case 'l':
+          move_next_char('r');
+          break;
+      }
+      getyx(gui.hex_cols[current_window], cursor.y, cursor.x);
+      mvwchgat(gui.ascii, cursor.y, current_window, 1, A_BOLD, 0, NULL);
+      wrefresh(gui.ascii);
+      wrefresh(gui.hex_cols[current_window]);
+    };
+
+    echo();
+    mvwprintw(gui.status, 0, 0, ":");
+    wrefresh(gui.status);
+    wgetstr(gui.status, str);
+
+    if (strcmp(str, "q") == 0) {
+      quit = 1;
     }
-    getyx(gui.hex_cols[current_window], cursor.y, cursor.x);
-    mvwchgat(gui.ascii, cursor.y, current_window, 1, A_BOLD, 0, NULL);
-    wrefresh(gui.ascii);
-    wrefresh(gui.hex_cols[current_window]);
-  };
+    else {
+      wclear(gui.status);
+      wrefresh(gui.status);
+      wrefresh(gui.hex_cols[current_window]);
+      noecho();
+    }
+
+  }
 
   close(file);
 

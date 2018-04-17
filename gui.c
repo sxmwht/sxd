@@ -56,13 +56,13 @@ void setUpGUI() {
 
   gui.title_height=3;
   gui.title_width=COLS;
-  gui.status_height=2;
+  gui.status_height=1;
   gui.colNr_height=2;
   gui.lineNr_width=20;
-  gui.lineNr_height=(LINES - gui.title_height - gui.status_height);
+  gui.lineNr_height=(LINES - gui.colNr_height - 2 - gui.title_height - gui.status_height);
   gui.status_width=COLS;
   gui.ascii_height=gui.lineNr_height;
-  gui.hex_height=(LINES - gui.title_height - gui.colNr_height - gui.status_height);
+  gui.hex_height=(LINES - gui.title_height - gui.colNr_height - gui.status_height - 2);
 
   gui.chars_per_line=((COLS - gui.lineNr_width) * 8 / 33);
 
