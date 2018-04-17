@@ -50,10 +50,10 @@ void move_next_char(char dir) {
     }
     else if (cursor.x == 1) {
       if (current_window == gui.ascii_width-1) {
-       // if (cursor.y > 0) {
+        if (cursor.y < gui.hex_height - 1) {
           wmove(gui.hex_cols[0], cursor.y + 1, 0);
           current_window = 0;
-        //}
+        }
       }
       else {
         wmove(gui.hex_cols[current_window+1], cursor.y, 0);
