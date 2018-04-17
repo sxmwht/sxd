@@ -232,6 +232,7 @@ int main (int argc, char **argv) {
       wrefresh(gui.status);
       wrefresh(gui.hex_cols[current_window]);
       noecho();
+      raw();
     }
 
   }

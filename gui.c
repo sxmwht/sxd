@@ -96,6 +96,8 @@ void setUpGUI() {
   wattrset(gui.title,  A_BOLD);
   wattrset(gui.lineNr, A_BOLD);
   wattrset(gui.colNr,  A_BOLD);
+
+  keypad(gui.status, TRUE);
  
 ////outline gui elements for debugging
 //  box(gui.ascii, 0,0);
