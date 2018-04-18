@@ -123,7 +123,7 @@ void test_print(char *map, struct stat *sb){
         //get cursor position in hex window
         getyx(gui.hex_cols[gui.ascii_width-1], cursor.y, cursor.x);
         mvwprintw(gui.ascii, cursor.y - 1, 0, "%s\n", tmp_data);
-        wrefresh(gui.ascii);
+//        wrefresh(gui.ascii);
 
         //blank the string
         tmp_data[0] = "\0";
@@ -133,7 +133,7 @@ void test_print(char *map, struct stat *sb){
       //print the new line number
       getyx(gui.hex_cols[0], cursor.y, cursor.x);
       mvwprintw(gui.lineNr, cursor.y, 0,"%4d\t%08x\t", i, i);
-      wrefresh(gui.lineNr);
+//      wrefresh(gui.lineNr);
       wmove(gui.hex_cols[0], cursor.y, 0);
     }
 
@@ -163,6 +163,7 @@ void test_print(char *map, struct stat *sb){
 
   //update window
   wrefresh(gui.ascii);
+  wrefresh(gui.lineNr);
 
   curs_set(2);
 
