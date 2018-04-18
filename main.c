@@ -38,47 +38,87 @@ char *open_file(int *file, struct stat *sb, char *fname){
   return map;
 }
 
+void move_next_byte (char dir) {
+  int cursor_new_height = cursor.y;
+  if (dir == 'r') {
+    if (current_window == gui.ascii_width - 1) {
+      if (cursor.y != gui.hex_height - 1) {
+        current_window = 0;
+        cursor_new_height = cursor.y + 1;
+      }
+    }
+    else
+      current_window++;
+  }
+
+  else if (dir == 'l') {
+    if (current_window == 0) {
+      if (cursor.y != 0) {
+        current_window = gui.ascii_width - 1;
+        cursor_new_height = cursor.y - 1;
+      }
+    }
+    else
+      current_window--;
+    
+  }
+
+  wmove(gui.hex_cols[current_window], cursor_new_height, 0);
+  wrefresh(gui.hex_cols[current_window]);
+
+  return;
+}
 
 void move_next_char(char dir) {
+
+  int cursor_new_y = cursor.y;
+  int cursor_new_x = cursor.x;
   
   char ch;
   int i = 1;
 
   if (dir == 'r') {
     if (cursor.x == 0) {
-      wmove(gui.hex_cols[current_window], cursor.y, 1);
+      cursor_new_x = 1;
     }
     else if (cursor.x == 1) {
       if (current_window == gui.ascii_width-1) {
         if (cursor.y < gui.hex_height - 1) {
-          wmove(gui.hex_cols[0], cursor.y + 1, 0);
           current_window = 0;
+          cursor_new_y = cursor.y + 1;
+          cursor_new_x = 0;
         }
       }
       else {
-        wmove(gui.hex_cols[current_window+1], cursor.y, 0);
         current_window++;
+        cursor_new_x = 0;
       }
     }
   }
 
   else if (dir == 'l') {
     if (cursor.x == 1) {
-      wmove(gui.hex_cols[current_window], cursor.y, 0);
+      cursor_new_x = 0;
     }
     else if (cursor.x == 0) {
       if (current_window == 0) {
         if (cursor.y > 0) {
-          wmove(gui.hex_cols[gui.ascii_width-1], cursor.y - 1, 1);
-          current_window = gui.ascii_width-1;
+          current_window = gui.ascii_width - 1;
+          cursor_new_y = cursor.y - 1;
+          cursor_new_x = 1;
         }
       }
       else {
-        wmove(gui.hex_cols[current_window-1], cursor.y, 1);
         current_window--;
+        cursor_new_x = 1;
       }
     }
   }
+
+  wmove(gui.hex_cols[current_window], cursor_new_y, cursor_new_x);
+
+  return;
+
 }
 
 void test_print(char *map, struct stat *sb){
@@ -101,6 +141,7 @@ void test_print(char *map, struct stat *sb){
       wprintw(gui.colNr, " ");
     wprintw(gui.colNr, "%02X ", i);
   }
+
   wprintw(gui.colNr, "\n");
   wrefresh(gui.colNr);
   wrefresh(gui.title);
@@ -176,6 +217,7 @@ void test_print(char *map, struct stat *sb){
   return;
 }
 
+
 int main (int argc, char **argv) {
 
   int file;
@@ -212,6 +254,13 @@ int main (int argc, char **argv) {
           break;
         case 'l':
           move_next_char('r');
+          break;
+
+        case 'w':
+          move_next_byte('r');
+          break;
+        case 'b':
+          move_next_byte('l');
           break;
       }
       getyx(gui.hex_cols[current_window], cursor.y, cursor.x);
