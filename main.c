@@ -38,10 +38,12 @@ char *open_file(int *file, struct stat *sb, char *fname){
   return map;
 }
 
-void move_next_byte (char dir) {
+void move_next_byte (char dir, int cursor_new_x) {
   int cursor_new_height = cursor.y;
   if (dir == 'r') {
-    if (current_window == gui.ascii_width - 1) {
+    if (cursor.x == 0 && cursor_new_x == 1)
+      cursor.x = cursor_new_x;
+    else if (current_window == gui.ascii_width - 1) {
       if (cursor.y != gui.hex_height - 1) {
         current_window = 0;
         cursor_new_height = cursor.y + 1;
@@ -52,7 +54,9 @@ void move_next_byte (char dir) {
   }
 
   else if (dir == 'l') {
-    if (current_window == 0) {
+    if (cursor.x == 1 && cursor_new_x == 0)
+      cursor.x = cursor_new_x;
+    else if (current_window == 0) {
       if (cursor.y != 0) {
         current_window = gui.ascii_width - 1;
         cursor_new_height = cursor.y - 1;
@@ -60,11 +64,11 @@ void move_next_byte (char dir) {
     }
     else
       current_window--;
-    
+
   }
 
-  wmove(gui.hex_cols[current_window], cursor_new_height, 0);
-  wrefresh(gui.hex_cols[current_window]);
+  wmove(gui.hex_cols[current_window], cursor_new_height, cursor_new_x);
+  //wrefresh(gui.hex_cols[current_window]);
 
   return;
 }
@@ -257,10 +261,31 @@ int main (int argc, char **argv) {
           break;
 
         case 'w':
-          move_next_byte('r');
+          move_next_byte('r', 0);
           break;
         case 'b':
-          move_next_byte('l');
+          move_next_byte('l', 0);
+          break;
+        case 'e':
+          move_next_byte('r', 1);
+          break;
+
+        case 'g':
+          ch = getch();
+          if (ch == 'g') {
+            current_window = 0;
+            wmove(gui.hex_cols[current_window], 0, 0);
+            break;
+          }
+          else if (ch == 'e') {
+            move_next_byte('l', 1);
+            break;
+          }
+          else 
+            break;
+        case 'G':
+          current_window = gui.ascii_width - 1;
+          wmove(gui.hex_cols[current_window], gui.hex_height - 1, 1);
           break;
       }
       getyx(gui.hex_cols[current_window], cursor.y, cursor.x);
