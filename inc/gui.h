@@ -24,6 +24,7 @@ struct GUI {
   int status_height;
   int status_width;
   WINDOW** hex_cols;
+  WINDOW* debug;
 } gui;
 
 
